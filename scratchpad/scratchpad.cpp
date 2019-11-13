@@ -9,8 +9,7 @@ int main(){
 
 
 	BoardGame* game = new Minesweeper(9, 9, 10);
-	std::cout<<"RESETTING"<<std::endl;
-	game->reset();
+	// game->handle(0,4,"right");
 
 	return 0;
 }

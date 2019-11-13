@@ -3,15 +3,15 @@
 #include <vector>
 #include <stdlib.h>
 #include <BoardGame.h>
+#include<Cell.h>
 class Minesweeper : public BoardGame
 {
-    std::vector<std::vector<int>> board;
-    std::vector<std::vector<int>> adjNum;
+    std::vector<std::vector<Cell>> board;
     int row;
     int col;
     int numOfMine;
     bool terminateState;
-
+    Minesweeper(){};
 public:
     Minesweeper(int, int, int);
     ~Minesweeper();
@@ -19,8 +19,7 @@ public:
     void reset();
     void handle(int, int, MouseButton = left);
     void reveal(int, int);
-    void flag(int, int);
-    void expand(int, int);
+    void expand(int,int);
     ucm::json getBoard();
 };
 
