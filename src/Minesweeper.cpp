@@ -71,24 +71,25 @@ void Minesweeper::init(int row, int col, int numOfMine)
             counter = 0;
         }
     }
-    for (auto i : board)
-    {
-        for (auto j : i)
-        {
-            std::cout << j.checkState() << " ";
-        }
-        std::cout << std::endl;
-    }
-    std::cout << std::endl;
+    // //Print all the board
+    // for (auto i : board)
+    // {
+    //     for (auto j : i)
+    //     {
+    //         std::cout << j.checkState() << " ";
+    //     }
+    //     std::cout << std::endl;
+    // }
+    // std::cout << std::endl;
 
-    for (auto i : board)
-    {
-        for (auto j : i)
-        {
-            std::cout << j.getAdjNum() << " ";
-        }
-        std::cout << std::endl;
-    }
+    // for (auto i : board)
+    // {
+    //     for (auto j : i)
+    //     {
+    //         std::cout << j.getAdjNum() << " ";
+    //     }
+    //     std::cout << std::endl;
+    // }
 }
 
 ucm::json Minesweeper::getBoard()
@@ -203,13 +204,13 @@ void Minesweeper::reveal(int x, int y)
 
 void Minesweeper::expand(int x, int y)
 {
-    std::cout << "Expand: " + std::to_string(x) + ", " + std::to_string(y) << std::endl;
+    // std::cout << "Expand: " + std::to_string(x) + ", " + std::to_string(y) << std::endl;
     int rlimit = board.size();
     int climit = board[0].size();
 
     if (board[x][y].isRevealed())
     {
-        std::cout << "reveal b" << std::endl;
+        // std::cout << "reveal b" << std::endl;
         return;
     }
     else
@@ -224,11 +225,10 @@ void Minesweeper::expand(int x, int y)
                 {
 
                     //check if the given neighbor is expandable
-                    std::cout
-                        << "CHecking" << std::endl;
+                    // std::cout << "CHecking" << std::endl;
                     if (board[i][j].isEmpty() || board[i][j].isAdjNum())
                     {
-                        std::cout << "Expanding: " + std::to_string(i) + ", " + std::to_string(j) << std::endl;
+                        //std::cout << "Expanding: " + std::to_string(i) + ", " + std::to_string(j) << std::endl;
                         expand(i, j);
                     }
                 }
