@@ -10,16 +10,22 @@ Minesweeper::Minesweeper(int row, int col, int numOfMine)
     this->row = row;
     this->col = col;
     this->numOfMine = numOfMine;
+    this->remainMine = numOfMine;
     init(row, col, numOfMine);
+}
+
+void Minesweeper::resetRemainMine(int num)
+{
+    remainMine = num;
 }
 
 void Minesweeper::init(int row, int col, int numOfMine)
 {
+    resetRemainMine(numOfMine);
     terminateState = false;
     std::vector<std::vector<Cell>> temp(row, std::vector<Cell>(col, Cell()));
     // std::vector<std::vector<int>> adjtemp(row, std::vector<int>(col, 0));
     // adjNum = adjtemp;
-
     int count = 0;
     while (count < numOfMine)
     {
@@ -133,7 +139,14 @@ ucm::json Minesweeper::getBoard()
         }
         result["board"].push_back(temprow);
     }
-    result["state"] = (terminateState);
+    if (remainMine == 0)
+    {
+        result["state"] = ("Win");
+    }
+    else
+    {
+        result["state"] = (terminateState);
+    }
     return result;
 }
 
@@ -174,11 +187,26 @@ void Minesweeper::handle(int x, int y, MouseButton btn)
     else if (btn == right)
     {
         //If not flagged
+        //----------------------NEED TO CHECK WIN! CHECK WHATS UNDER THE FLAG IF MINE THEN COUNT-- THE MINE AS WELL
         if (board[x][y].checkState() != "Flag")
         {
-            board[x][y].setPreveal(board[x][y].isRevealed());
-            board[x][y].setPstate(board[x][y].checkState());
-            board[x][y].setFlag();
+            if (board[x][y].checkState() == "Bomb")
+            {
+                remainMine--;
+                board[x][y].setPreveal(board[x][y].isRevealed());
+                board[x][y].setPstate(board[x][y].checkState());
+                board[x][y].setFlag();
+
+                board[x][y].setRevealed(true);
+            }
+            else
+            {
+                board[x][y].setPreveal(board[x][y].isRevealed());
+                board[x][y].setPstate(board[x][y].checkState());
+                board[x][y].setFlag();
+
+                board[x][y].setRevealed(true);
+            }
         }
         else if (board[x][y].checkState() == "Flag")
         {
@@ -196,10 +224,85 @@ void Minesweeper::reveal(int x, int y)
         terminateState = true;
         board[x][y].setExplode();
     }
+    else if (board[x][y].isAdjNum())
+    {
+        int rlimit = board.size();
+        int climit = board[0].size();
+        int bombX;
+        int bombY;
+        for (int i = std::max(0, x - 1); i <= std::min(x + 1, rlimit - 1); i++)
+        {
+            for (int j = std::max(0, y - 1); j <= std::min(y + 1, climit - 1); j++)
+            {
+                if (i != x || j != y)
+                {
+                    //check if the given neighbor is a bomb
+                    if (board[i][j].isBomb())
+                    {
+                        bombX = i;
+                        bombY = j;
+                        continue;
+                    }
+                }
+            }
+        }
+        expandAdj(x, y, bombX, bombY);
+    }
     else
     {
         expand(x, y);
     }
+}
+
+void Minesweeper::expandAdj(int x, int y, int BX, int BY)
+{
+    int rlimit = board.size();
+    int climit = board[0].size();
+
+    if (board[x][y].isRevealed())
+    {
+        return;
+    }
+    else
+    {
+        board[x][y].setRevealed(true);
+        for (int i = std::max(0, x - 1); i <= std::min(x + 1, rlimit - 1); i++)
+        {
+            for (int j = std::max(0, y - 1); j <= std::min(y + 1, climit - 1); j++)
+            {
+                if (i != x || j != y)
+                {
+                    //check if the given neighbor is expandable
+                    // std::cout << "CHecking" << std::endl;
+                    if (board[i][j].isAdjNum() && neighborcoor(i, j, BX, BY))
+                    {
+                        //std::cout << "Expanding: " + std::to_string(i) + ", " + std::to_string(j) << std::endl;
+                        expandAdj(i, j,BX, BY);
+                    }
+                }
+            }
+        }
+    }
+}
+
+bool Minesweeper::neighborcoor(int x, int y, int BX, int BY)
+{
+    int rlimit = board.size();
+    int climit = board[0].size();
+    for (int i = std::max(0, x - 1); i <= std::min(x + 1, rlimit - 1); i++)
+    {
+        for (int j = std::max(0, y - 1); j <= std::min(y + 1, climit - 1); j++)
+        {
+            if (i != x || j != y)
+            {
+                if (i == BX && j == BY)
+                {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
 }
 
 void Minesweeper::expand(int x, int y)
@@ -223,10 +326,9 @@ void Minesweeper::expand(int x, int y)
             {
                 if (i != x || j != y)
                 {
-
                     //check if the given neighbor is expandable
                     // std::cout << "CHecking" << std::endl;
-                    if (board[i][j].isEmpty() || board[i][j].isAdjNum())
+                    if (board[i][j].isEmpty())
                     {
                         //std::cout << "Expanding: " + std::to_string(i) + ", " + std::to_string(j) << std::endl;
                         expand(i, j);

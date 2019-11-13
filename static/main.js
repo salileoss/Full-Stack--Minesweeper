@@ -59,7 +59,12 @@ function updateGrid(data) {
 			}
 		}
 		alert("Game Over!");
-	} else {
+	} else if (terminateState == "Win") {
+		alert("Congratulations, you've detected all the mines!");
+
+	}
+
+	else {
 		var row;
 		var col;
 		for (row in board) {
@@ -68,7 +73,7 @@ function updateGrid(data) {
 				var x = parseInt(row);
 				var y = parseInt(col);
 				if (board[x][y] == "Empty") {
-					$(sel).html("Empty");
+					$(sel).html("");
 				} else if (board[x][y] == "1") {
 					$(sel).html("1");
 				} else if (board[x][y] == "2") {
